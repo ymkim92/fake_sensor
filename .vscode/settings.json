@@ -1,0 +1,28 @@
+// install flake8 and black formatter extensions in vscode
+{
+    "editor.rulers": [
+        99,
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+    },
+    "isort.args": [
+        "--profile",
+        "black"
+    ],
+    "flake8.args": [
+        "--max-line-length=100"
+    ],
+    "black-formatter.args": [
+        "--line-length=100"
+    ],    
+    "pylint.args": [
+        "--disable=W0511",
+        "--disable=C0115",
+        "--disable=C0116"
+    ]
+}
