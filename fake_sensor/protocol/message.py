@@ -2,7 +2,7 @@
 
 import struct
 
-import crcmod.predefined
+import crcmod.predefined  # type: ignore
 
 # CRC16 Modbus
 crc16 = crcmod.predefined.mkPredefinedCrcFun("modbus")
