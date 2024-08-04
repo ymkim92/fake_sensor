@@ -16,14 +16,14 @@ class Message:
     def __init__(self, type_: int, value: bytes = b""):
         self.sync = self.SYNC_BYTE
         self.type = type_
-        self.len = len(value)
+        self.data_len = len(value)
         self.value = value
-        self.crc = crc16(struct.pack(">BBB", self.sync, self.type, self.len) + self.value)
+        self.crc = crc16(struct.pack(">BBB", self.sync, self.type, self.data_len) + self.value)
 
     def pack(self) -> bytes:
         """Pack the message into bytes"""
         return (
-            struct.pack(">BBB", self.sync, self.type, self.len)
+            struct.pack(">BBB", self.sync, self.type, self.data_len)
             + self.value
             + struct.pack(">H", self.crc)
         )
@@ -38,8 +38,8 @@ class Message:
         if sync != Message.SYNC_BYTE:
             raise ValueError("Invalid sync byte")
 
-        value = data[3 : 3 + len_]
-        crc_received = struct.unpack(">H", data[3 + len_ : 5 + len_])[0]
+        value = data[3:3 + len_]
+        crc_received = struct.unpack(">H", data[3 + len_:5 + len_])[0]
         crc_calculated = crc16(struct.pack(">BBB", sync, type_, len_) + value)
 
         if crc_received != crc_calculated:
