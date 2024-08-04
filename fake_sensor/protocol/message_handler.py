@@ -10,7 +10,7 @@ class MessageHandler:
     """Message handler"""
 
     def __init__(
-        self, message_packer: Callable[[Any], bytes], message_unpacker: Callable[[bytes], Any]
+        self, message_packer: Callable[[Any], bytes], message_unpacker: Callable[[Any], Message]
     ):
         self.message_packer = message_packer
         self.message_unpacker = message_unpacker

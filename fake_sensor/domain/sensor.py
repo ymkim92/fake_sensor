@@ -5,4 +5,4 @@ import dataclasses
 
 @dataclasses.dataclass
 class Sensor:
-    version
+    """version"""

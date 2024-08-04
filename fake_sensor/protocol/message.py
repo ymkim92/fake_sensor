@@ -38,26 +38,15 @@ class Message:
         if sync != Message.SYNC_BYTE:
             raise ValueError("Invalid sync byte")
 
-        value = data[3:3 + len_]
-        crc_received = struct.unpack(">H", data[3 + len_:5 + len_])[0]
+        start_index = 3
+        end_index = 3 + len_
+        value = data[start_index:end_index]
+        start_index = 3 + len_
+        end_index = 5 + len_
+        crc_received = struct.unpack(">H", data[start_index:end_index])[0]
         crc_calculated = crc16(struct.pack(">BBB", sync, type_, len_) + value)
 
         if crc_received != crc_calculated:
             raise ValueError("CRC mismatch")
 
         return Message(type_, value)
-
-
-# Example usage
-if __name__ == "__main__":
-    # Create a message
-    version_response = Message(type_=0x01, value=struct.pack(">BBB8s", 1, 0, 1, b"12345678"))
-
-    # Pack the message
-    packed_message = version_response.pack()
-    print(f"Packed message: {packed_message.hex()}")
-
-    # Unpack the message
-    unpacked_message = Message.unpack(packed_message)
-    print(f"Unpacked message type: {unpacked_message.type}")
-    print(f"Unpacked message value: {unpacked_message.value.hex()}")

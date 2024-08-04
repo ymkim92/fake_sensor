@@ -10,7 +10,7 @@ class Status:
     def __init__(self, value: int = 0):
         self.value = value
 
-    def clear(self):
+    def clear(self) -> None:
         self.value = 0
 
     def take(self) -> int:
@@ -18,15 +18,15 @@ class Status:
         self.clear()
         return tmp
 
-    def set(self, bit):
+    def set(self, bit: int) -> None:
         self.value |= bit
 
-    def to_value(self):
+    def to_value(self) -> int:
         return self.value
 
     @classmethod
-    def from_value(cls, value):
+    def from_value(cls, value: int) -> "Status":
         return cls(value)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"status(value={self.value:08b})"
