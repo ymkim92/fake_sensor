@@ -46,8 +46,8 @@ class Status:
         :return: A string showing the status register value and constants set.
         """
         set_constants = [name for bit, name in Status._constant_map.items() if self.value & bit]
-        set_constants_str = ", ".join(set_constants) if set_constants else "None"
-        return f"Status(value={self.value:08b}, constants={{ {set_constants_str} }})"
+        set_constants_str = ",".join(set_constants) if set_constants else "None"
+        return f"Status(value=0x{self.value:02x}, constants={set_constants_str})"
 
     @classmethod
     def count_constants(cls) -> int:
