@@ -18,7 +18,7 @@ class Status:
     }
 
     def __init__(self, value: int = 0):
-        self.value = value & ((1 << Status.count_constants()) - 1)
+        self.value = value & ((1 << Status.count_names()) - 1)
 
     def clear(self) -> None:
         self.value = 0
@@ -41,20 +41,20 @@ class Status:
     def __repr__(self) -> str:
         """
         Return a string representation of the status register,
-        showing which constants are set.
+        showing which names are set.
 
-        :return: A string showing the status register value and constants set.
+        :return: A string showing the status register value and names set.
         """
-        set_constants = [name for bit, name in Status._constant_map.items() if self.value & bit]
-        set_constants_str = ",".join(set_constants) if set_constants else "None"
-        return f"Status(value=0x{self.value:02x}, constants={set_constants_str})"
+        set_names = [name for bit, name in Status._constant_map.items() if self.value & bit]
+        set_names_str = ",".join(set_names) if set_names else "None"
+        return f"Status(value=0x{self.value:02x}, names={set_names_str})"
 
     @classmethod
-    def count_constants(cls) -> int:
+    def count_names(cls) -> int:
         """
         Count the number of constant attributes in the Status class.
 
         :return: The number of constant attributes.
         """
-        constants = [attr for attr in dir(cls) if attr.isupper() and attr.startswith("STATUS_")]
-        return len(constants)
+        names = [attr for attr in dir(cls) if attr.isupper() and attr.startswith("STATUS_")]
+        return len(names)
