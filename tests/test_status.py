@@ -35,4 +35,5 @@ def test_status_repr(status_input, expected_value, expected_repr) -> None:
     assert repr(status) == expected_repr
 
 
-# def test_status_set() -> None:
+def test_status_set() -> None:
+    
