@@ -4,7 +4,6 @@ from enum import Enum
 
 
 class StatusType(Enum):
-
     # DO NOT create an empty bit. Use reserved bit
     DATA1_READY = 0
     DATA2_READY = 1
@@ -13,7 +12,6 @@ class StatusType(Enum):
 
 
 class Status:
-
     def __init__(self, value: int = 0):
         self.value = value & ((1 << len(StatusType)) - 1)
 

@@ -25,7 +25,7 @@ class MessageHandler:
 # Example usage
 if __name__ == "__main__":
     # Create a message
-    version_response = Message(type_=0x01, value=struct.pack(">BBB8s", 1, 0, 1, b"12345678"))
+    version_response = Message(type_=0x01, data=struct.pack(">BBB8s", 1, 0, 1, b"12345678"))
 
     # Pack the message
     packed_message = version_response.pack()
