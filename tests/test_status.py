@@ -2,7 +2,7 @@
 
 import pytest
 
-from fake_sensor.protocol.field_status import Status
+from fake_sensor.protocol.field_status import Status, StatusType
 
 
 def test_status_initialization() -> None:
@@ -15,7 +15,7 @@ def test_status_initialization() -> None:
 
 
 def test_number_of_status() -> None:
-    assert Status.count_names() == 4
+    assert len(StatusType) == 4
 
 
 @pytest.mark.parametrize(
@@ -36,4 +36,45 @@ def test_status_repr(status_input, expected_value, expected_repr) -> None:
 
 
 def test_status_set() -> None:
-    
+    status = Status()
+    status.set(StatusType.DATA1_READY)
+    assert status.to_value() == 1 << StatusType.DATA1_READY.value
+    status.set(StatusType.DATA2_READY)
+    assert status.to_value() == (1 << StatusType.DATA1_READY.value) | (
+        1 << StatusType.DATA2_READY.value
+    )
+    status.set(StatusType.RESERVED1)
+    assert status.to_value() == (1 << StatusType.DATA1_READY.value) | (
+        1 << StatusType.DATA2_READY.value
+    ) | (1 << StatusType.RESERVED1.value)
+
+    status.set(StatusType.OVERRUN_ERROR)
+    assert status.to_value() == (1 << StatusType.DATA1_READY.value) | (
+        1 << StatusType.DATA2_READY.value
+    ) | (1 << StatusType.RESERVED1.value) | (1 << StatusType.OVERRUN_ERROR.value)
+
+
+def test_status_clear() -> None:
+    status = Status()
+    status.set(StatusType.DATA1_READY)
+    status.set(StatusType.DATA2_READY)
+    assert status.to_value() == (1 << StatusType.DATA1_READY.value) | (
+        1 << StatusType.DATA2_READY.value
+    )
+    status.clear()
+    assert status.to_value() == 0
+
+
+def test_status_take() -> None:
+    status = Status()
+    status.set(StatusType.DATA1_READY)
+    status.set(StatusType.DATA2_READY)
+    assert status.take() == (1 << StatusType.DATA1_READY.value) | (
+        1 << StatusType.DATA2_READY.value
+    )
+    assert status.to_value() == 0
+
+
+def test_status_from_value() -> None:
+    status = Status.from_value(3)
+    assert status.to_value() == 3

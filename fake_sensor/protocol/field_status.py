@@ -1,25 +1,21 @@
 """status field"""
 
+from enum import Enum
+
+
+class StatusType(Enum):
+
+    # DO NOT create an empty bit. Use reserved bit
+    DATA1_READY = 0
+    DATA2_READY = 1
+    RESERVED1 = 2
+    OVERRUN_ERROR = 3
+
 
 class Status:
 
-    # TO get the number of status, it should start with "STATUS_"
-    # DO NOT create an empty bit. Use reserved bit
-    STATUS_DATA1_READY = 0
-    STATUS_DATA2_READY = 1
-    STATUS_RESERVED1 = 2
-    STATUS_OVERRUN_ERROR = 3
-
-    status_name_map = {
-        STATUS_DATA1_READY: "DATA1_READY",
-        STATUS_DATA2_READY: "DATA2_READY",
-        STATUS_RESERVED1: "RESERVED1",
-        # This must be the last one
-        STATUS_OVERRUN_ERROR: "OVERRUN_ERROR",
-    }
-
     def __init__(self, value: int = 0):
-        self.value = value & ((1 << Status.count_names()) - 1)
+        self.value = value & ((1 << len(StatusType)) - 1)
 
     def clear(self) -> None:
         self.value = 0
@@ -29,11 +25,8 @@ class Status:
         self.clear()
         return tmp
 
-    def set(self, bit_shift: int) -> None:
-        if bit_shift > self.STATUS_OVERRUN_ERROR:
-            return False
-
-        self.value |= 1 << bit_shift
+    def set(self, bit_shift: StatusType) -> None:
+        self.value |= 1 << bit_shift.value
         return True
 
     def to_value(self) -> int:
@@ -50,20 +43,6 @@ class Status:
 
         :return: A string showing the status register value and names set.
         """
-        set_names = [
-            name
-            for bit_shift, name in Status.status_name_map.items()
-            if self.value & (1 << bit_shift)
-        ]
+        set_names = [status.name for status in StatusType if self.value & (1 << status.value)]
         set_names_str = ",".join(set_names) if set_names else "None"
         return f"Status(value=0x{self.value:02x}, names={set_names_str})"
-
-    @classmethod
-    def count_names(cls) -> int:
-        """
-        Count the number of constant attributes in the Status class.
-
-        :return: The number of constant attributes.
-        """
-        names = [attr for attr in dir(cls) if attr.isupper() and attr.startswith("STATUS_")]
-        return len(names)
