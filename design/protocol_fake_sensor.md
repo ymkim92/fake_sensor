@@ -3,6 +3,8 @@
   - sync: 0xA3
   - len: length of value
 
+* the protocol utilises big endian format.
+
 # Command list
 
 | Command name                           | Type | Length (Bytes)                                       |
