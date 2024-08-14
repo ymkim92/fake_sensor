@@ -34,4 +34,4 @@ if __name__ == "__main__":
     # Unpack the message
     unpacked_message = Message.unpack(packed_message)
     print(f"Unpacked message type: {unpacked_message.type}")
-    print(f"Unpacked message value: {unpacked_message.value.hex()}")
+    print(f"Unpacked message value: {unpacked_message.data.hex()}")

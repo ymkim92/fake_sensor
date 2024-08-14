@@ -25,7 +25,6 @@ class Status:
 
     def set(self, bit_shift: StatusType) -> None:
         self.value |= 1 << bit_shift.value
-        return True
 
     def to_value(self) -> int:
         return self.value
