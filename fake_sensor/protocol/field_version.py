@@ -2,6 +2,7 @@
 
 
 class Version:
+    # pylint: disable=fixme
     # TODO add commit count
     # https://py-pkgs.org/07-releasing-versioning#automatic-version-bumping
 
@@ -16,19 +17,19 @@ class Version:
         self.patch = patch
         self.git_sha = git_sha
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         output = f"Version(major={self.major}, minor={self.minor}, patch={self.patch}, "
         output += f"git_sha={self.git_sha:08x})"
         return output
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.major}.{self.minor}.{self.patch}-g{self.git_sha:08x}"
 
     def to_bytes(self) -> bytes:
         return bytes([self.major, self.minor, self.patch]) + self.git_sha.to_bytes(4, "big")
 
     @classmethod
-    def from_bytes(cls, data: bytes):
+    def from_bytes(cls, data: bytes) -> "Version":
         if len(data) != 7:
             raise ValueError("Data must be exactly 7 bytes.")
         major, minor, patch = data[:3]

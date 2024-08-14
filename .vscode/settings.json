@@ -24,5 +24,11 @@
         "--disable=W0511",
         "--disable=C0115",
         "--disable=C0116"
+    ],
+    "mypy-type-checker.args": [
+        "--ignore-missing-imports",
+        "--follow-imports=silent",
+        "--show-column-numbers",
+        "--strict"
     ]
 }

@@ -10,7 +10,7 @@ class MessageHandler:
     """Message handler"""
 
     def __init__(
-        self, message_packer: Callable[[Any], bytes], message_unpacker: Callable[[bytes], Any]
+        self, message_packer: Callable[[Any], bytes], message_unpacker: Callable[[Any], Message]
     ):
         self.message_packer = message_packer
         self.message_unpacker = message_unpacker
@@ -25,7 +25,7 @@ class MessageHandler:
 # Example usage
 if __name__ == "__main__":
     # Create a message
-    version_response = Message(type_=0x01, value=struct.pack(">BBB8s", 1, 0, 1, b"12345678"))
+    version_response = Message(type_=0x01, data=struct.pack(">BBB8s", 1, 0, 1, b"12345678"))
 
     # Pack the message
     packed_message = version_response.pack()
@@ -34,4 +34,4 @@ if __name__ == "__main__":
     # Unpack the message
     unpacked_message = Message.unpack(packed_message)
     print(f"Unpacked message type: {unpacked_message.type}")
-    print(f"Unpacked message value: {unpacked_message.value.hex()}")
+    print(f"Unpacked message value: {unpacked_message.data.hex()}")
