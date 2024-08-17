@@ -1,9 +1,18 @@
+"""test message"""
+
 import struct
 
 import crcmod.predefined
 import pytest
 
-from fake_sensor.protocol.message import Message, MessageType
+from fake_sensor.protocol.message import (
+    Message,
+    MessageErrorCrc,
+    MessageErrorSize,
+    MessageInvalidSync,
+    MessageSizeMismatched,
+    MessageType,
+)
 
 # CRC16 Modbus function
 crc16 = crcmod.predefined.mkPredefinedCrcFun("modbus")
@@ -39,36 +48,51 @@ def test_message_decode():
     assert unpacked_message.crc == original_message.crc
 
 
-# def test_unpack_invalid_sync_byte():
-#     # Create a valid message and then modify the sync byte
-#     type_ = MessageType.DATA
-#     data = b"testdata"
-#     message = Message(type_, data)
-#     packed_message = message.pack()
-#     invalid_packed_message = b"\xFF" + packed_message[1:]  # Change sync byte to invalid value
+def test_decode_invalid_sync_byte():
+    type_ = MessageType.DATA
+    data = b"testdata"
+    message = Message(type_, data)
+    encoded_message = message.encode()
+    invalid_encoded_message = b"\xFF" + encoded_message[1:]
 
-#     # Expect ValueError due to invalid sync byte
-#     with pytest.raises(ValueError, match="Invalid sync byte"):
-#         Message.unpack(invalid_packed_message)
+    with pytest.raises(MessageInvalidSync, match="Invalid sync byte"):
+        Message.decode(invalid_encoded_message)
 
 
-# def test_unpack_invalid_crc():
-#     # Create a valid message and then modify the CRC
-#     type_ = 0x01
-#     data = b"testdata"
-#     message = Message(type_, data)
-#     packed_message = message.pack()
-#     invalid_packed_message = packed_message[:-2] + b"\x00\x00"  # Change CRC to an invalid value
+def test_decode_invalid_crc():
+    type_ = MessageType.DATA
+    data = b"testdata"
+    message = Message(type_, data)
+    encoded_message = message.encode()
+    invalid_encoded_message = encoded_message[:-1] + bytes([encoded_message[-1] ^ 1])
 
-#     # Expect ValueError due to CRC mismatch
-#     with pytest.raises(ValueError, match="CRC mismatch"):
-#         Message.unpack(invalid_packed_message)
+    with pytest.raises(MessageErrorCrc, match="CRC mismatch"):
+        Message.decode(invalid_encoded_message)
 
 
-# def test_unpack_short_message():
-#     # Create a short message that's not valid
-#     short_message = b"\xA3\x01\x08"
+def test_decode_short_message():
+    short_message = b"\xA3\x01\x08"
 
-#     # Expect ValueError due to data too short
-#     with pytest.raises(ValueError, match="Data too short to be a valid message"):
-#         Message.unpack(short_message)
+    with pytest.raises(MessageErrorSize, match="Data too short to be a valid message"):
+        Message.decode(short_message)
+
+
+def test_decode_long_message():
+    long_message = b"\xA3\x01\x08" + bytes(30)
+
+    with pytest.raises(MessageErrorSize, match="Data too long to be a valid message"):
+        Message.decode(long_message)
+
+
+def test_decode_message_size_mismatched():
+    type_ = MessageType.DATA
+    data = b"testdata"
+    message = Message(type_, data)
+    message.data_len += 1
+    encoded_message = message.encode()
+
+    with pytest.raises(
+        MessageSizeMismatched,
+        match=f"Expected data size {len(data)}, received data size {len(data) + 1}",
+    ):
+        Message.decode(encoded_message)

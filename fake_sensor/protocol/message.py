@@ -8,6 +8,9 @@ import crcmod.predefined  # type: ignore
 # CRC16 Modbus
 crc16 = crcmod.predefined.mkPredefinedCrcFun("modbus")
 
+
+MESSAGE_HEADER_LEN = 3
+MESSAGE_CRC_LEN = 2
 MIN_MESSAGE_LENGTH = 5
 MAX_MESSAGE_LENGTH = 32
 
@@ -23,6 +26,10 @@ class MessageType(Enum):
 
 
 class MessageErrorSize(ValueError):
+    pass
+
+
+class MessageSizeMismatched(ValueError):
     pass
 
 
@@ -62,16 +69,22 @@ class Message:
         if len(message) > MAX_MESSAGE_LENGTH:
             raise MessageErrorSize(f"Data too long to be a valid message: {len(message)}")
 
-        sync, type_, len_ = struct.unpack(">BBB", message[:3])
+        sync, type_, data_len = struct.unpack(">BBB", message[:MESSAGE_HEADER_LEN])
         if sync != Message.SYNC_BYTE:
             raise MessageInvalidSync("Invalid sync byte")
+        if len(message) != data_len + MESSAGE_HEADER_LEN + MESSAGE_CRC_LEN:
+            expected_data_size = len(message) - MESSAGE_HEADER_LEN - MESSAGE_CRC_LEN
+            raise MessageSizeMismatched(
+                f"Expected data size {expected_data_size}, received data size {data_len}"
+            )
 
-        start_index = 3
-        end_index = 3 + len_
+        start_index = MESSAGE_HEADER_LEN
+        end_index = MESSAGE_HEADER_LEN + data_len
         _header = message[:start_index]
         _data = message[start_index:end_index]
-        start_index = 3 + len_
-        end_index = 5 + len_
+
+        start_index = MESSAGE_HEADER_LEN + data_len
+        end_index = MESSAGE_HEADER_LEN + data_len + MESSAGE_CRC_LEN
         crc_received = struct.unpack(">H", message[start_index:end_index])[0]
         crc_calculated = crc16(_header + _data)
 
