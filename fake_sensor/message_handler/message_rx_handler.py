@@ -1,19 +1,18 @@
 """ZeroMQ RX handler"""
 
-from typing import Any, Callable
-
-from .interface_rx_handler import IRxHandler
-from .interface_rx_parser import IRxParser
+from fake_sensor.interface.interface_rx_handler import IRxHandler
+from fake_sensor.interface.interface_rx_parser import IRxParser
 
 
 # pylint: disable=too-few-public-methods
-class ZeroMqRxHandler(IRxHandler):
+class MessageRxHandler(IRxHandler):
     """ZeroMQ RX handler"""
 
-    def __init__(self, message_parser: IRxParser, zmq_subscribe: XXX):
+    def __init__(self, message_parser: IRxParser, message_subscriber: IRxHandler):
         self.message_parser = message_parser
+        self.message_subscriber = message_subscriber
 
     def receive_message(self) -> bytes:
-        """receive message by zmq subscribe"""
-        # zmq subscribe
-        # return self.message_parser(message)
+        """receive message by subscriber"""
+        message = self.message_subscriber.receive_message()
+        return self.message_parser(message)

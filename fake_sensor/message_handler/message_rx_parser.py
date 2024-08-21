@@ -2,9 +2,8 @@
 
 from typing import Any, Callable
 
+from fake_sensor.interface.interface_rx_parser import IRxParser, ParserState
 from fake_sensor.protocol.message import Message
-
-from .interface_rx_parser import IRxParser, ParserState
 
 
 class MessageRxParser(IRxParser):
