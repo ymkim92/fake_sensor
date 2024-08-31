@@ -61,6 +61,7 @@ class Message:
             + self.crc.to_bytes(2, "big")
         )
 
+    # "Message" is a forward reference
     @staticmethod
     def decode(message: bytes) -> "Message":
         """Decode bytes into a Message instance"""
