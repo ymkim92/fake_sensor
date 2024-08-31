@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Optional
 
 
 class ParserState(Enum):
@@ -17,10 +16,7 @@ class ParserState(Enum):
 # pylint: disable=too-few-public-methods
 class IRxParser(ABC):
     @abstractmethod
-    def receive_message(self, data: bytes) -> Optional[bytes]:
-        """returns message when it collects a valid message
-        input data can be a part of message
-        """
+    def receive_message(self) -> bytes:
         pass
 
     @abstractmethod

@@ -19,7 +19,7 @@
     ],
     "black-formatter.args": [
         "--line-length=100"
-    ],
+    ],    
     "pylint.args": [
         "--disable=W0511",
         "--disable=C0115",
@@ -35,6 +35,5 @@
         "tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "editor.fontSize": 14
+    "python.testing.pytestEnabled": true
 }

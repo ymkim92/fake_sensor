@@ -1,36 +1,22 @@
 """message RX parser"""
 
-from enum import Enum, auto
-from typing import Optional
+from typing import Any, Callable
 
 from fake_sensor.interface.interface_rx_parser import IRxParser, ParserState
-
-
-class Event(Enum):
-    RECEIVING_VALID_BYTE = auto()
-    RECEIVED_END_OF_MESSAGE = auto()
-    RECEIVE_ = auto()
-    RECEIVE_DATA_CRC = auto()
-    RECEIVE_ = auto()
-
-
-
-class Action(Enum):
-    PRINT_STATUS = auto()
-    LOCK = auto()
-    UNLOCK = auto()
+from fake_sensor.protocol.message import Message
 
 
 class MessageRxParser(IRxParser):
     """Message RX parser"""
 
-    def __init__(self):
-        self.stored_data = bytearray()
+    def __init__(
+        self,
+        message_decoder: Callable[[Any], Message],
+    ):
+        self.message_decoder = message_decoder
 
-    def receive_data(self, data: bytes) -> Optional[bytes]:
+    def receive_data(self) -> bytes:
         """recv"""
-        for byte in data:
-
 
     def get_state(self) -> ParserState:
         """get state"""
