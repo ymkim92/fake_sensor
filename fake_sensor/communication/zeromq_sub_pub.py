@@ -31,10 +31,10 @@ class ZeroMqSubPub(ICommunication):
             return True
 
         except zmq.ZMQError as e:
-            logging.error(f"ZMQError occurred: {e}")
+            print(f"ZMQError occurred: {e}")
             return False
         except Exception as e:
-            logging.error(f"An unexpected error occurred: {e}")
+            print(f"An unexpected error occurred: {e}")
             return False
 
     def disconnect(self) -> bool:
