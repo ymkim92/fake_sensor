@@ -1,5 +1,7 @@
 """ZeroMQ sub/pub"""
 
+from typing import Optional
+
 import zmq
 
 from .interface_communication import ICommunication
@@ -22,11 +24,13 @@ class ZeroMqSubPub(ICommunication):
             # Create and bind the PUB socket
             self.pub_socket = context.socket(zmq.PUB)
             self.pub_socket.bind(self.communication_port)
+            self.pub_socket.setsockopt(zmq.SNDHWM, 2)  # Set send queue size
 
             # Create and connect the SUB socket
             self.sub_socket = context.socket(zmq.SUB)
             self.sub_socket.connect(self.communication_port)
             self.sub_socket.setsockopt(zmq.SUBSCRIBE, self.communication_topic)
+            self.sub_socket.setsockopt(zmq.RCVHWM, 2)  # Set receive queue size
 
             return True
 
@@ -51,8 +55,16 @@ class ZeroMqSubPub(ICommunication):
         bytes_sent = self.pub_socket.send(message)
         return bytes_sent == len(message)
 
-    def receive_data(self) -> bytes:
-        message = self.sub_socket.recv()
+    def receive_data(self) -> Optional[bytes]:
+        try:
+            message = self.sub_socket.recv(zmq.NOBLOCK)
+        except zmq.error.Again:
+            # no data available
+            return None
+        except zmq.ZMQError as e:
+            print(f"Receive failed: {e}")
+            return None
+
         topic, data = message.split(TOPIC_SEPARATOR)
         assert topic == self.communication_topic
         return data
