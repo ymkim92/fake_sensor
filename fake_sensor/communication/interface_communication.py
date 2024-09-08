@@ -1,6 +1,7 @@
 """interface for communication"""
 
 from abc import ABC, abstractmethod
+from typing import Optional
 
 
 # pylint: disable=too-few-public-methods
@@ -18,5 +19,5 @@ class ICommunication(ABC):
         pass
 
     @abstractmethod
-    def receive_data(self) -> bytes:
+    def receive_data(self) -> Optional[bytes]:
         pass
