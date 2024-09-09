@@ -6,11 +6,11 @@ from .interface_communication import ICommunication
 
 
 class QueueSubPub(ICommunication):
-    def __init__(self):
-        self.queue = None
+    def __init__(self, queue_size):
+        self.queue = Queue(maxsize=queue_size)
+        self.queue_size = queue_size
 
     def connect(self) -> bool:
-        self.queue = Queue()
         return True
 
     def disconnect(self) -> bool:

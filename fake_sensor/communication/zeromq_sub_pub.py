@@ -9,6 +9,7 @@ from zmq.utils.monitor import recv_monitor_message
 from .interface_communication import ICommunication
 
 TOPIC_SEPARATOR = b" "
+ZEROMQ_CONNECTION_TIME = 0.001
 
 
 class ZeroMqSubPub(ICommunication):
@@ -18,25 +19,29 @@ class ZeroMqSubPub(ICommunication):
         self.sub_queue_size = sub_queue_size
         self.pub_queue_size = pub_queue_size
 
+        self.context = zmq.Context()
+
+        self.pub_socket = self.context.socket(zmq.PUB)
+        self.pub_socket.bind(self.communication_port)
+        self.pub_socket.setsockopt(zmq.SNDHWM, self.pub_queue_size)
+
         self.sub_socket: Optional[zmq.Socket] = None
-        self.pub_socket: Optional[zmq.Socket] = None
 
     def connect(self) -> bool:
         try:
-            context = zmq.Context()
-
-            # Create and bind the PUB socket
-            self.pub_socket = context.socket(zmq.PUB)
-            self.pub_socket.bind(self.communication_port)
-            self.pub_socket.setsockopt(zmq.SNDHWM, self.pub_queue_size)
-
             # Create and connect the SUB socket
-            self.sub_socket = context.socket(zmq.SUB)
+            self.sub_socket = self.context.socket(zmq.SUB)
             self.sub_socket.connect(self.communication_port)
             self.sub_socket.setsockopt(zmq.SUBSCRIBE, self.communication_topic)
             self.sub_socket.setsockopt(zmq.RCVHWM, self.sub_queue_size)
 
-            self.event_connected_monitor()
+            # ZeroMQ does not offer a built-in, direct way to check
+            # if a PUB/SUB connection is fully established between sockets.
+            # This is because ZeroMQ is designed to be asynchronous,
+            # and its PUB/SUB pattern doesn't guarantee message delivery
+            # if the subscriber isn't yet connected.
+            time.sleep(0.001)
+
             return True
 
         except zmq.ZMQError as e:
@@ -83,42 +88,12 @@ class ZeroMqSubPub(ICommunication):
         assert topic == self.communication_topic
         return data
 
-    # def event_connected_monitor(self) -> None:
-    #     if not self.pub_socket:
-    #         return
-    #     monitor = self.pub_socket.get_monitor_socket()
-    #     if not monitor:
-    #         return
-    #     while monitor.poll():
-    #         evt: Dict[str, Any] = {}
-    #         mon_evt = recv_monitor_message(monitor)
-    #         evt.update(mon_evt)
-    #         print(f"Event: {evt}")
-    #         if evt["event"] == zmq.EVENT_CONNECTED:
-    #             print("subscriber is connected!")
-    #             break
+    # Context Manager Methods
+    def __enter__(self):
+        """Handle setup when entering the context."""
+        self.connect()
+        return self
 
-    #     monitor.close()
-
-    def event_connected_monitor(self, timeout=5000) -> None:
-        if not self.pub_socket:
-            return
-
-        monitor = self.pub_socket.get_monitor_socket(zmq.EVENT_ALL)
-        if not monitor:
-            return
-
-        poller = zmq.Poller()
-        poller.register(monitor, zmq.POLLIN)
-
-        start_time = time.time()
-        while time.time() - start_time < timeout / 1000:  # Timeout in seconds
-            socks = dict(poller.poll(timeout))
-            if monitor in socks and socks[monitor] == zmq.POLLIN:
-                evt = recv_monitor_message(monitor)
-                print(f"Event: {evt}")
-                if evt["event"] == zmq.EVENT_CONNECTED:
-                    print("Subscriber is connected!")
-                    break
-
-        monitor.close()
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Handle cleanup when exiting the context."""
+        self.disconnect()

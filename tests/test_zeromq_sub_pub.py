@@ -21,14 +21,26 @@ def test_zeromq_sub_pub(zeromq_sub_pub_fixture: ZeroMqSubPub) -> None:
     zero_mq = zeromq_sub_pub_fixture
     zero_mq.connect()
 
-    # Why this is necessary?
-    time.sleep(0.1)
-
     assert zero_mq.send_data(b"0123")
     assert zero_mq.send_data(b"012a")
+    # This will be dropped silently
     assert zero_mq.send_data(b"012b")
     time.sleep(0.1)
     assert zero_mq.receive_data() == b"0123"
-    # assert zero_mq.receive_data() == b"012a"
-    # assert zero_mq.receive_data() is None
+    assert zero_mq.receive_data() == b"012a"
+    assert zero_mq.receive_data() is None
     zero_mq.disconnect()
+
+
+def test_zeromq_sub_pub_with_context() -> None:
+    with ZeroMqSubPub(
+        COMMUNICATION_TOPIC, COMMUNICATION_PORT, SUB_QUEUE_SIZE, PUB_QUEUE_SIZE
+    ) as zero_mq:
+        assert zero_mq.send_data(b"0123")
+        assert zero_mq.send_data(b"012a")
+        # This will be dropped silently
+        assert zero_mq.send_data(b"012b")
+        time.sleep(0.1)
+        assert zero_mq.receive_data() == b"0123"
+        assert zero_mq.receive_data() == b"012a"
+        assert zero_mq.receive_data() is None
