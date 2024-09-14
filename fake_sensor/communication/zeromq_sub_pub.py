@@ -1,7 +1,8 @@
 """ZeroMQ sub/pub"""
 
 import time
-from typing import Optional
+from typing import Optional, Type
+from types import TracebackType
 
 import zmq
 
@@ -24,7 +25,7 @@ class ZeroMqSubPub(ICommunication):
         self.pub_socket.bind(self.communication_port)
         self.pub_socket.setsockopt(zmq.SNDHWM, self.pub_queue_size)
 
-        self.sub_socket: Optional[zmq.Socket] = None
+        self.sub_socket: Optional[zmq.Socket] = None  # type: ignore
 
     def connect(self) -> bool:
         try:
@@ -88,11 +89,15 @@ class ZeroMqSubPub(ICommunication):
         return data
 
     # Context Manager Methods
-    def __enter__(self):
+    def __enter__(self) -> None:
         """Handle setup when entering the context."""
         self.connect()
-        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
         """Handle cleanup when exiting the context."""
         self.disconnect()

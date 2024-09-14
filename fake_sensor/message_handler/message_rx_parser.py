@@ -9,9 +9,7 @@ from fake_sensor.interface.interface_rx_parser import IRxParser, ParserState
 class Event(Enum):
     RECEIVING_VALID_BYTE = auto()
     RECEIVED_END_OF_MESSAGE = auto()
-    RECEIVE_ = auto()
     RECEIVE_DATA_CRC = auto()
-    RECEIVE_ = auto()
 
 
 class Action(Enum):
@@ -23,7 +21,7 @@ class Action(Enum):
 class MessageRxParser(IRxParser):
     """Message RX parser"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.stored_data = bytearray()
 
     def receive_data(self, data: bytes) -> Optional[bytes]:
@@ -32,3 +30,4 @@ class MessageRxParser(IRxParser):
 
     def get_state(self) -> ParserState:
         """get state"""
+        return ParserState.READY
