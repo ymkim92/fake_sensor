@@ -1,8 +1,8 @@
 """ZeroMQ sub/pub"""
 
 import time
-from typing import Optional, Type
 from types import TracebackType
+from typing import Optional, Type
 
 import zmq
 
@@ -89,9 +89,10 @@ class ZeroMqSubPub(ICommunication):
         return data
 
     # Context Manager Methods
-    def __enter__(self) -> None:
+    def __enter__(self) -> "ZeroMqSubPub":
         """Handle setup when entering the context."""
         self.connect()
+        return self
 
     def __exit__(
         self,
