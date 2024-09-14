@@ -2,9 +2,10 @@
 
 from typing import Any, Callable
 
-from .interface_tx_handler import ITxHandler
+from fake_sensor.interface.interface_tx_handler import ITxHandler
 
 
+# pylint: disable=too-few-public-methods
 class MessageTxHandler(ITxHandler):
     """Message TX handler"""
 

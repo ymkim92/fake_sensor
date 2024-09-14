@@ -21,7 +21,6 @@ class IRxParser(ABC):
         """returns message when it collects a valid message
         input data can be a part of message
         """
-        pass
 
     @abstractmethod
     def get_state(self) -> ParserState:

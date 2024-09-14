@@ -1,7 +1,5 @@
 """version test"""
 
-import time
-
 import pytest
 
 from fake_sensor.communication.queue_sub_pub import QueueSubPub

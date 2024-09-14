@@ -14,7 +14,6 @@ class Event(Enum):
     RECEIVE_ = auto()
 
 
-
 class Action(Enum):
     PRINT_STATUS = auto()
     LOCK = auto()
@@ -29,8 +28,7 @@ class MessageRxParser(IRxParser):
 
     def receive_data(self, data: bytes) -> Optional[bytes]:
         """recv"""
-        for byte in data:
-
+        # for byte in data:
 
     def get_state(self) -> ParserState:
         """get state"""

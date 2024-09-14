@@ -51,7 +51,9 @@ class Message:
         self.type = type_
         self.data_len = len(data)
         self.data = data
-        self.crc = crc16(struct.pack(">BBB", self.sync, self.type.value, self.data_len) + self.data)
+        self.crc = crc16(
+            struct.pack(">BBB", self.sync, self.type.value, self.data_len) + self.data
+        )
 
     def encode(self) -> bytes:
         """Encode the message into bytes"""

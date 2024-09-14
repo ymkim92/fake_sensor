@@ -1,10 +1,9 @@
 """ZeroMQ sub/pub"""
 
 import time
-from typing import Any, Dict, Optional
+from typing import Optional
 
 import zmq
-from zmq.utils.monitor import recv_monitor_message
 
 from .interface_communication import ICommunication
 
@@ -47,7 +46,7 @@ class ZeroMqSubPub(ICommunication):
         except zmq.ZMQError as e:
             print(f"ZMQError occurred: {e}")
             return False
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"An unexpected error occurred: {e}")
             return False
 
